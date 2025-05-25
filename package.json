@@ -1,0 +1,11 @@
+{
+  "name": "whendy2025",
+  "version": "1.0.0",
+  "description": "Framework 2025",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "author": "",
+  "license": "ISC"
+}
