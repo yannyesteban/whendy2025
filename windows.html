@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Ventanas Flotantes</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .desktop {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .taskbar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            z-index: 10000;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .start-button {
+            background: linear-gradient(45deg, #007acc, #0099ff);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin-right: 20px;
+        }
+
+        .start-button:hover {
+            background: linear-gradient(45deg, #0099ff, #00ccff);
+            transform: translateY(-1px);
+        }
+
+        .taskbar-windows {
+            display: flex;
+            gap: 8px;
+        }
+
+        .taskbar-item {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .taskbar-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .taskbar-item.active {
+            background: rgba(255, 255, 255, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .window {
+            position: absolute;
+            min-width: 300px;
+            min-height: 200px;
+            background: #f0f0f0;
+            border: 1px solid #ccc;
+            border-radius: 8px 8px 0 0;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .window.active {
+            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.4);
+        }
+
+        .window.minimized {
+            display: none;
+        }
+
+        .window-header {
+            background: linear-gradient(180deg, #e1e1e1 0%, #d1d1d1 100%);
+            padding: 8px 12px;
+            cursor: move;
+            user-select: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #bbb;
+        }
+
+        .window.active .window-header {
+            background: linear-gradient(180deg, #007acc 0%, #005a9e 100%);
+            color: white;
+        }
+
+        .window-title {
+            font-size: 14px;
+            font-weight: 500;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            flex: 1;
+        }
+
+        .window-controls {
+            display: flex;
+            gap: 4px;
+        }
+
+        .window-control {
+            width: 24px;
+            height: 20px;
+            border: none;
+            cursor: pointer;
+            font-size: 12px;
+            border-radius: 2px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .minimize-btn {
+            background: #ffd700;
+            color: #333;
+        }
+
+        .minimize-btn:hover {
+            background: #ffed4a;
+        }
+
+        .maximize-btn {
+            background: #28a745;
+            color: white;
+        }
+
+        .maximize-btn:hover {
+            background: #34ce57;
+        }
+
+        .close-btn {
+            background: #dc3545;
+            color: white;
+        }
+
+        .close-btn:hover {
+            background: #e94560;
+        }
+
+        .window-content {
+            padding: 20px;
+            height: calc(100% - 40px);
+            overflow: auto;
+            background: white;
+        }
+
+        .resize-handle {
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            width: 16px;
+            height: 16px;
+            cursor: nw-resize;
+            background: linear-gradient(135deg, transparent 0%, transparent 40%, #ccc 40%, #ccc 60%, transparent 60%);
+        }
+
+        .demo-content {
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .demo-content h3 {
+            color: #007acc;
+            margin-bottom: 10px;
+        }
+
+        .demo-content p {
+            margin-bottom: 15px;
+        }
+
+        .demo-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .demo-button {
+            background: #007acc;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .demo-button:hover {
+            background: #005a9e;
+        }
+    </style>
+</head>
+<body>
+    <div class="desktop" id="desktop">
+        <div class="taskbar">
+            <button class="start-button" onclick="createWindow()">Nueva Ventana</button>
+            <div class="taskbar-windows" id="taskbar-windows"></div>
+        </div>
+    </div>
+
+    <script>
+        class WindowManager {
+            constructor() {
+                this.windows = new Map();
+                this.currentZIndex = 1000;
+                this.windowCounter = 0;
+                this.desktop = document.getElementById('desktop');
+                this.taskbar = document.getElementById('taskbar-windows');
+                this.activeWindow = null;
+                this.dragState = null;
+                this.resizeState = null;
+                
+                this.initializeEventListeners();
+            }
+
+            initializeEventListeners() {
+                document.addEventListener('mousedown', (e) => this.handleMouseDown(e));
+                document.addEventListener('mousemove', (e) => this.handleMouseMove(e));
+                document.addEventListener('mouseup', (e) => this.handleMouseUp(e));
+                document.addEventListener('selectstart', (e) => {
+                    if (this.dragState || this.resizeState) e.preventDefault();
+                });
+            }
+
+            createWindow(options = {}) {
+                const windowId = `window-${++this.windowCounter}`;
+                const defaultOptions = {
+                    title: `Ventana ${this.windowCounter}`,
+                    width: 400,
+                    height: 300,
+                    x: 50 + (this.windowCounter - 1) * 30,
+                    y: 50 + (this.windowCounter - 1) * 30,
+                    content: this.getDefaultContent()
+                };
+
+                const config = { ...defaultOptions, ...options };
+                
+                const windowElement = this.createWindowElement(windowId, config);
+                this.desktop.appendChild(windowElement);
+                
+                const windowData = {
+                    id: windowId,
+                    element: windowElement,
+                    config: config,
+                    isMinimized: false,
+                    isMaximized: false,
+                    originalBounds: null
+                };
+
+                this.windows.set(windowId, windowData);
+                this.createTaskbarItem(windowData);
+                this.focusWindow(windowId);
+                
+                return windowId;
+            }
+
+            createWindowElement(windowId, config) {
+                const windowEl = document.createElement('div');
+                windowEl.className = 'window';
+                windowEl.id = windowId;
+                windowEl.style.cssText = `
+                    left: ${config.x}px;
+                    top: ${config.y}px;
+                    width: ${config.width}px;
+                    height: ${config.height}px;
+                    z-index: ${++this.currentZIndex};
+                `;
+
+                windowEl.innerHTML = `
+                    <div class="window-header">
+                        <div class="window-title">${config.title}</div>
+                        <div class="window-controls">
+                            <button class="window-control minimize-btn" onclick="windowManager.minimizeWindow('${windowId}')">−</button>
+                            <button class="window-control maximize-btn" onclick="windowManager.toggleMaximize('${windowId}')">□</button>
+                            <button class="window-control close-btn" onclick="windowManager.closeWindow('${windowId}')">×</button>
+                        </div>
+                    </div>
+                    <div class="window-content">
+                        ${config.content}
+                    </div>
+                    <div class="resize-handle"></div>
+                `;
+
+                return windowEl;
+            }
+
+            createTaskbarItem(windowData) {
+                const taskbarItem = document.createElement('button');
+                taskbarItem.className = 'taskbar-item';
+                taskbarItem.id = `taskbar-${windowData.id}`;
+                taskbarItem.textContent = windowData.config.title;
+                taskbarItem.onclick = () => this.toggleWindow(windowData.id);
+                this.taskbar.appendChild(taskbarItem);
+            }
+
+            focusWindow(windowId) {
+                const windowData = this.windows.get(windowId);
+                if (!windowData || windowData.isMinimized) return;
+
+                // Remover clase active de todas las ventanas
+                this.windows.forEach(win => {
+                    win.element.classList.remove('active');
+                    document.getElementById(`taskbar-${win.id}`).classList.remove('active');
+                });
+
+                // Activar la ventana actual
+                windowData.element.style.zIndex = ++this.currentZIndex;
+                windowData.element.classList.add('active');
+                document.getElementById(`taskbar-${windowId}`).classList.add('active');
+                this.activeWindow = windowId;
+            }
+
+            minimizeWindow(windowId) {
+                const windowData = this.windows.get(windowId);
+                if (!windowData) return;
+
+                windowData.element.classList.add('minimized');
+                windowData.isMinimized = true;
+                document.getElementById(`taskbar-${windowId}`).classList.remove('active');
+
+                // Enfocar otra ventana si existe
+                const visibleWindows = Array.from(this.windows.values()).filter(w => !w.isMinimized);
+                if (visibleWindows.length > 0) {
+                    this.focusWindow(visibleWindows[visibleWindows.length - 1].id);
+                } else {
+                    this.activeWindow = null;
+                }
+            }
+
+            toggleMaximize(windowId) {
+                const windowData = this.windows.get(windowId);
+                if (!windowData) return;
+
+                if (windowData.isMaximized) {
+                    // Restaurar tamaño original
+                    const bounds = windowData.originalBounds;
+                    windowData.element.style.cssText = `
+                        left: ${bounds.x}px;
+                        top: ${bounds.y}px;
+                        width: ${bounds.width}px;
+                        height: ${bounds.height}px;
+                        z-index: ${windowData.element.style.zIndex};
+                    `;
+                    windowData.isMaximized = false;
+                } else {
+                    // Guardar tamaño actual y maximizar
+                    const rect = windowData.element.getBoundingClientRect();
+                    windowData.originalBounds = {
+                        x: rect.left,
+                        y: rect.top,
+                        width: rect.width,
+                        height: rect.height
+                    };
+                    
+                    windowData.element.style.cssText = `
+                        left: 0px;
+                        top: 0px;
+                        width: 100vw;
+                        height: calc(100vh - 50px);
+                        z-index: ${windowData.element.style.zIndex};
+                    `;
+                    windowData.isMaximized = true;
+                }
+            }
+
+            toggleWindow(windowId) {
+                const windowData = this.windows.get(windowId);
+                if (!windowData) return;
+
+                if (windowData.isMinimized) {
+                    windowData.element.classList.remove('minimized');
+                    windowData.isMinimized = false;
+                    this.focusWindow(windowId);
+                } else if (this.activeWindow === windowId) {
+                    this.minimizeWindow(windowId);
+                } else {
+                    this.focusWindow(windowId);
+                }
+            }
+
+            closeWindow(windowId) {
+                const windowData = this.windows.get(windowId);
+                if (!windowData) return;
+
+                windowData.element.remove();
+                document.getElementById(`taskbar-${windowId}`).remove();
+                this.windows.delete(windowId);
+
+                if (this.activeWindow === windowId) {
+                    const visibleWindows = Array.from(this.windows.values()).filter(w => !w.isMinimized);
+                    if (visibleWindows.length > 0) {
+                        this.focusWindow(visibleWindows[visibleWindows.length - 1].id);
+                    } else {
+                        this.activeWindow = null;
+                    }
+                }
+            }
+
+            handleMouseDown(e) {
+                const window = e.target.closest('.window');
+                if (!window) return;
+
+                const windowId = window.id;
+                this.focusWindow(windowId);
+
+                if (e.target.classList.contains('window-header') || e.target.classList.contains('window-title')) {
+                    this.startDrag(e, window);
+                } else if (e.target.classList.contains('resize-handle')) {
+                    this.startResize(e, window);
+                }
+            }
+
+            startDrag(e, window) {
+                const rect = window.getBoundingClientRect();
+                this.dragState = {
+                    window: window,
+                    offsetX: e.clientX - rect.left,
+                    offsetY: e.clientY - rect.top
+                };
+                window.style.cursor = 'move';
+            }
+
+            startResize(e, window) {
+                const rect = window.getBoundingClientRect();
+                this.resizeState = {
+                    window: window,
+                    startX: e.clientX,
+                    startY: e.clientY,
+                    startWidth: rect.width,
+                    startHeight: rect.height
+                };
+                document.body.style.cursor = 'nw-resize';
+            }
+
+            handleMouseMove(e) {
+                if (this.dragState) {
+                    const newX = e.clientX - this.dragState.offsetX;
+                    const newY = e.clientY - this.dragState.offsetY;
+                    
+                    this.dragState.window.style.left = Math.max(0, Math.min(newX, window.innerWidth - 100)) + 'px';
+                    this.dragState.window.style.top = Math.max(0, Math.min(newY, window.innerHeight - 100)) + 'px';
+                }
+
+                if (this.resizeState) {
+                    const deltaX = e.clientX - this.resizeState.startX;
+                    const deltaY = e.clientY - this.resizeState.startY;
+                    
+                    const newWidth = Math.max(300, this.resizeState.startWidth + deltaX);
+                    const newHeight = Math.max(200, this.resizeState.startHeight + deltaY);
+                    
+                    this.resizeState.window.style.width = newWidth + 'px';
+                    this.resizeState.window.style.height = newHeight + 'px';
+                }
+            }
+
+            handleMouseUp(e) {
+                if (this.dragState) {
+                    this.dragState.window.style.cursor = '';
+                    this.dragState = null;
+                }
+
+                if (this.resizeState) {
+                    document.body.style.cursor = '';
+                    this.resizeState = null;
+                }
+            }
+
+            getDefaultContent() {
+                const contents = [
+                    `<div class="demo-content">
+                        <h3>Ventana de Ejemplo</h3>
+                        <p>Esta es una ventana flotante completamente funcional. Puedes:</p>
+                        <ul>
+                            <li>Arrastrarla desde la barra de título</li>
+                            <li>Redimensionarla desde la esquina inferior derecha</li>
+                            <li>Minimizarla, maximizarla o cerrarla</li>
+                            <li>Hacer click en ella para enfocarla</li>
+                        </ul>
+                        <div class="demo-buttons">
+                            <button class="demo-button" onclick="windowManager.createWindow()">Nueva Ventana</button>
+                            <button class="demo-button" onclick="alert('¡Funciona!')">Probar</button>
+                        </div>
+                    </div>`,
+                    `<div class="demo-content">
+                        <h3>Editor de Texto</h3>
+                        <textarea style="width: 100%; height: 150px; border: 1px solid #ccc; padding: 10px; border-radius: 4px;" placeholder="Escribe aquí..."></textarea>
+                        <div class="demo-buttons">
+                            <button class="demo-button">Guardar</button>
+                            <button class="demo-button">Limpiar</button>
+                        </div>
+                    </div>`,
+                    `<div class="demo-content">
+                        <h3>Calculadora</h3>
+                        <input type="text" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px;" placeholder="Resultado">
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px;">
+                            <button class="demo-button">7</button>
+                            <button class="demo-button">8</button>
+                            <button class="demo-button">9</button>
+                            <button class="demo-button">/</button>
+                            <button class="demo-button">4</button>
+                            <button class="demo-button">5</button>
+                            <button class="demo-button">6</button>
+                            <button class="demo-button">*</button>
+                            <button class="demo-button">1</button>
+                            <button class="demo-button">2</button>
+                            <button class="demo-button">3</button>
+                            <button class="demo-button">-</button>
+                            <button class="demo-button">0</button>
+                            <button class="demo-button">.</button>
+                            <button class="demo-button">=</button>
+                            <button class="demo-button">+</button>
+                        </div>
+                    </div>`
+                ];
+                
+                return contents[Math.floor(Math.random() * contents.length)];
+            }
+        }
+
+        // Inicializar el gestor de ventanas
+        const windowManager = new WindowManager();
+
+        // Función global para crear ventanas
+        function createWindow() {
+            windowManager.createWindow();
+        }
+
+        // Crear ventana inicial
+        windowManager.createWindow({
+            title: 'Bienvenido',
+            x: 100,
+            y: 100,
+            content: `
+                <div class="demo-content">
+                    <h3>¡Bienvenido al Sistema de Ventanas!</h3>
+                    <p>Este es un sistema completo de ventanas flotantes que imita el comportamiento de Windows.</p>
+                    <p><strong>Características:</strong></p>
+                    <ul>
+                        <li>Ventanas arrastrables</li>
+                        <li>Redimensionables</li>
+                        <li>Minimizar/Maximizar/Cerrar</li>
+                        <li>Gestión de foco automática</li>
+                        <li>Barra de tareas funcional</li>
+                        <li>Z-index dinámico</li>
+                    </ul>
+                    <div class="demo-buttons">
+                        <button class="demo-button" onclick="createWindow()">Crear Nueva Ventana</button>
+                    </div>
+                </div>
+            `
+        });
+    </script>
+</body>
+</html>

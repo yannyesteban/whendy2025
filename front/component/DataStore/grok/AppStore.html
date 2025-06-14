@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pantalla Dividida</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: space-between;
+      padding: 20px;
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+    web-app {
+      flex: 1;
+      max-width: 45%;
+    }
+  </style>
+</head>
+<body>
+  <web-app name="uno"></web-app>
+  <web-app name="dos"></web-app>
+  <script src="reactive-store.js"></script>
+</body>
+</html>

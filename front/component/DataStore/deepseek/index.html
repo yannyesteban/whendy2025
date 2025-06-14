@@ -1,0 +1,19 @@
+<data-store id="appState"></data-store>
+
+<script>
+  const store = document.getElementById('appState');
+  
+  store.addEventListener('user-change', (e) => {
+    console.log('User changed:', e.detail);
+  });
+  
+  store.addEventListener('store-change', (e) => {
+    console.log('Store changed:', e.detail);
+  });
+  
+  // Inicializar datos
+  store.data.user = {name: 'John'};
+  
+  // Modificar datos
+  store.data.user.name = 'Jane'; // Disparará eventos
+</script>

@@ -1,0 +1,21 @@
+<reactive-store id="store" type="app" data-initial='{"count": 0, "user": "Alice"}' debug></reactive-store>
+
+<script>
+  const store = document.querySelector('#store');
+
+  // Suscribirse a cambios en 'count'
+  const unsubscribe = store.subscribe('count', (value, mode) => {
+    console.log(`Count updated to ${value} (${mode})`);
+  });
+
+  // Escuchar eventos generales
+  store.addEventListener('change', (e) => {
+    console.log(`Change detected: ${e.detail.key} = ${e.detail.value} (${e.detail.mode})`);
+  });
+
+  // Manipular datos
+  store.set('count', 1); // Dispara eventos y callback
+  store.set('count', 2); // Dispara eventos y callback
+  store.remove('count'); // Dispara eventos 'count-delete' y 'delete'
+  unsubscribe(); // Cancela la suscripción
+</script>
