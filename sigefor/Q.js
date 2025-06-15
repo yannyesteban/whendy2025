@@ -1,3 +1,7 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = exports.Q = exports.QElement = void 0;
+exports.getParentElement = getParentElement;
 // Utilidades mejoradas
 const utils = {};
 const setProp = (obj, attrs, value) => {
@@ -10,7 +14,7 @@ const setProp = (obj, attrs, value) => {
 };
 // Caché para mejorar performance
 const elementCache = new WeakMap();
-export class QElement {
+class QElement {
     _element;
     constructor(element) {
         if (!element || !(element instanceof HTMLElement)) {
@@ -65,13 +69,13 @@ export class QElement {
     }
     // Métodos de creación optimizados
     add(config) {
-        const element = Q.create(config);
+        const element = exports.Q.create(config);
         if (element)
             this.append(element);
         return this;
     }
     create(config) {
-        const element = Q.create(config);
+        const element = exports.Q.create(config);
         if (element)
             this.append(element);
         return element;
@@ -79,9 +83,9 @@ export class QElement {
     findOrCreate(selector, tagName) {
         const existing = this._element.querySelector(selector);
         if (existing) {
-            return Q(existing);
+            return (0, exports.Q)(existing);
         }
-        const newElement = Q.create(tagName);
+        const newElement = exports.Q.create(tagName);
         if (newElement) {
             this.append(newElement);
             return newElement;
@@ -184,20 +188,20 @@ export class QElement {
     children() {
         return Array.from(this._element.children)
             .filter((child) => child instanceof HTMLElement)
-            .map(child => Q(child));
+            .map(child => (0, exports.Q)(child));
     }
     query(selector) {
         const element = this._element.querySelector(selector);
-        return element ? Q(element) : null;
+        return element ? (0, exports.Q)(element) : null;
     }
     queryAll(selector) {
         return Array.from(this._element.querySelectorAll(selector))
             .filter((element) => element instanceof HTMLElement)
-            .map(element => Q(element));
+            .map(element => (0, exports.Q)(element));
     }
     parent() {
         const parent = this._element.parentElement;
-        return parent ? Q(parent) : null;
+        return parent ? (0, exports.Q)(parent) : null;
     }
     // Método appendTo mejorado
     appendTo(target) {
@@ -244,11 +248,11 @@ export class QElement {
     }
     closest(selector) {
         const element = this._element.closest(selector);
-        return element ? Q(element) : null;
+        return element ? (0, exports.Q)(element) : null;
     }
     clone(deep = true) {
         const cloned = this._element.cloneNode(deep);
-        return Q(cloned);
+        return (0, exports.Q)(cloned);
     }
     empty() {
         this._element.innerHTML = '';
@@ -263,8 +267,9 @@ export class QElement {
         return this;
     }
 }
+exports.QElement = QElement;
 // Función Q mejorada
-export const Q = (query) => {
+const Q = (query) => {
     if (query instanceof QElement) {
         return query;
     }
@@ -286,12 +291,14 @@ export const Q = (query) => {
     }
     return element ? new QElement(element) : null;
 };
+exports.Q = Q;
+exports.default = exports.Q;
 // Métodos estáticos mejorados
-Q.id = (id) => {
+exports.Q.id = (id) => {
     const element = document.getElementById(id);
-    return element ? Q(element) : null;
+    return element ? (0, exports.Q)(element) : null;
 };
-Q.create = (config) => {
+exports.Q.create = (config) => {
     let element;
     try {
         if (typeof config === "string") {
@@ -308,24 +315,24 @@ Q.create = (config) => {
         else {
             return null;
         }
-        return Q(element);
+        return (0, exports.Q)(element);
     }
     catch (error) {
         console.error('Error creating element:', error);
         return null;
     }
 };
-Q.query = (selector) => {
+exports.Q.query = (selector) => {
     const element = document.querySelector(selector);
-    return element ? Q(element) : null;
+    return element ? (0, exports.Q)(element) : null;
 };
-Q.queryAll = (selector) => {
+exports.Q.queryAll = (selector) => {
     return Array.from(document.querySelectorAll(selector))
         .filter((element) => element instanceof HTMLElement)
-        .map(element => Q(element));
+        .map(element => (0, exports.Q)(element));
 };
 // Función bind mejorada con mejor tipado
-Q.bind = (fn, context, ...args) => {
+exports.Q.bind = (fn, context, ...args) => {
     if (typeof fn === "function") {
         return fn.bind(context, ...args);
     }
@@ -335,7 +342,7 @@ Q.bind = (fn, context, ...args) => {
     throw new Error("Invalid function parameter");
 };
 // Función fire global
-Q.fire = (element, eventName, detail) => {
+exports.Q.fire = (element, eventName, detail) => {
     const targetElement = element instanceof QElement ? element.get() : element;
     const event = new CustomEvent(eventName, {
         detail,
@@ -345,7 +352,7 @@ Q.fire = (element, eventName, detail) => {
     targetElement.dispatchEvent(event);
 };
 // Utilidad para encontrar elemento padre (optimizada)
-export function getParentElement(child, parentTag) {
+function getParentElement(child, parentTag) {
     const upperCaseTag = parentTag.toUpperCase();
     let current = child.parentElement;
     while (current) {
@@ -357,7 +364,7 @@ export function getParentElement(child, parentTag) {
     return null;
 }
 // Funciones de utilidad adicionales
-Q.ready = (callback) => {
+exports.Q.ready = (callback) => {
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', callback);
     }
@@ -365,9 +372,7 @@ Q.ready = (callback) => {
         callback();
     }
 };
-Q.each = (array, callback) => {
+exports.Q.each = (array, callback) => {
     array.forEach(callback);
 };
-// Exportar utilidades
-export { Q as default };
 //# sourceMappingURL=Q.js.map

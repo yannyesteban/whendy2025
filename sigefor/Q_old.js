@@ -1,3 +1,7 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Q = exports.QElement = void 0;
+exports.getParentElement = getParentElement;
 const utils = {};
 const setProp = (obj, attrs, value) => {
     if (typeof attrs === "object") {
@@ -9,7 +13,7 @@ const setProp = (obj, attrs, value) => {
         obj[attrs] = value;
     }
 };
-export class QElement {
+class QElement {
     e = null;
     constructor(element) {
         this.e = element;
@@ -50,21 +54,21 @@ export class QElement {
         return this;
     }
     add(config) {
-        const element = Q.create(config);
+        const element = exports.Q.create(config);
         this.append(element);
         return this;
     }
     create(config) {
-        const element = Q.create(config);
+        const element = exports.Q.create(config);
         this.append(element);
         return element;
     }
     findOrCreate(selector, tagName) {
         const ele = this.e.querySelector(selector);
         if (ele) {
-            return Q(ele);
+            return (0, exports.Q)(ele);
         }
-        const element = Q.create(tagName);
+        const element = exports.Q.create(tagName);
         this.append(element);
         return element;
     }
@@ -187,13 +191,13 @@ export class QElement {
         return this.e.classList.contains(className);
     }
     children() {
-        return Array.from(this.e.children).map((child) => Q(child));
+        return Array.from(this.e.children).map((child) => (0, exports.Q)(child));
     }
     query(selector) {
-        return Q(this.e.querySelector(selector));
+        return (0, exports.Q)(this.e.querySelector(selector));
     }
     queryAll(selector) {
-        return Array.from(this.e.querySelectorAll(selector)).map((child) => Q(child));
+        return Array.from(this.e.querySelectorAll(selector)).map((child) => (0, exports.Q)(child));
     }
     appendTo(target) {
         if (target instanceof HTMLElement) {
@@ -225,7 +229,8 @@ export class QElement {
         return getParentElement(this.e, tagName);
     }
 }
-export const Q = (query) => {
+exports.QElement = QElement;
+const Q = (query) => {
     if (query instanceof QElement) {
         return query;
     }
@@ -244,10 +249,11 @@ export const Q = (query) => {
     }
     return Object.assign(new QElement(e), utils);
 };
-Q.id = (id) => {
-    return Q(document.getElementById(id));
+exports.Q = Q;
+exports.Q.id = (id) => {
+    return (0, exports.Q)(document.getElementById(id));
 };
-Q.create = (config) => {
+exports.Q.create = (config) => {
     let e;
     if (typeof config === "object") {
         e = document.createElement(config.tagName);
@@ -263,15 +269,15 @@ Q.create = (config) => {
     else {
         return null;
     }
-    return Q(e);
+    return (0, exports.Q)(e);
 };
-Q.query = (selector) => {
-    return Q(document.body.querySelector(selector));
+exports.Q.query = (selector) => {
+    return (0, exports.Q)(document.body.querySelector(selector));
 };
-Q.queryAll = (selector) => {
-    return Array.from(document.body.querySelectorAll(selector)).map((child) => Q(child));
+exports.Q.queryAll = (selector) => {
+    return Array.from(document.body.querySelectorAll(selector)).map((child) => (0, exports.Q)(child));
 };
-Q.bind = (fn, context, ...arg) => {
+exports.Q.bind = (fn, context, ...arg) => {
     if (typeof fn === "function") {
         return fn.bind(context);
     }
@@ -282,7 +288,7 @@ Q.bind = (fn, context, ...arg) => {
         return Function(fn).bind(context);
     }
 };
-Q.fire = (element, eventName, detail) => {
+exports.Q.fire = (element, eventName, detail) => {
     const event = new CustomEvent(eventName, {
         detail,
         cancelable: true,
@@ -290,7 +296,7 @@ Q.fire = (element, eventName, detail) => {
     });
     element.dispatchEvent(event);
 };
-export function getParentElement(child, parentTag) {
+function getParentElement(child, parentTag) {
     let parent = child.parentNode;
     while (parent !== null) {
         if (parent.tagName === parentTag.toLocaleUpperCase()) {

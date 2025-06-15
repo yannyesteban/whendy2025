@@ -1,12 +1,13 @@
 {
     "compilerOptions": {
-        "module": "ESNext",
-        "moduleResolution": "Bundler",
+        "module": "CommonJS",//"ESNext",
+        "moduleResolution": "node",//"Bundler",
         "target": "ES2022",
         "jsx": "react-jsx",
         "strictNullChecks": true,
         "strictFunctionTypes": true,
-        "sourceMap": true
+        "sourceMap": true,
+        "esModuleInterop": true
     },
     "exclude": [
         "node_modules",
