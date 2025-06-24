@@ -35,9 +35,11 @@ export class JWT {
 
     constructor(opt?: JwtOptions) {
         if (opt) {
-            for (let key in opt) {
-                this[key] = opt[key];
-            }
+            if (opt.key !== undefined) this.key = opt.key;
+            if (opt.header !== undefined) this.header = { ...this.header, ...opt.header };
+            if (opt.expiresIn !== undefined) this.expiresIn = opt.expiresIn;
+            if (opt.issuer !== undefined) this.issuer = opt.issuer;
+            if (opt.audience !== undefined) this.audience = opt.audience;
         }
 
         if (!this.key || this.key.length < 32) {
@@ -122,7 +124,11 @@ export class JWT {
             const signature = this.getSignature(header + "." + encodedPayload);
             return `${header}.${encodedPayload}.${signature}`;
         } catch (error) {
-            throw new Error(`Error generando JWT: ${error.message}`);
+            if (error instanceof Error) {
+                throw new Error(`Error generando JWT: ${error.message}`);
+            } else {
+                throw new Error("Error generando JWT: error desconocido");
+            }
         }
     }
 

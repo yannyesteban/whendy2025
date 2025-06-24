@@ -1,16 +1,24 @@
 {
-    "compilerOptions": {
-        "module": "CommonJS",//"ESNext",
-        "moduleResolution": "node",//"Bundler",
-        "target": "ES2022",
-        "jsx": "react-jsx",
-        "strictNullChecks": true,
-        "strictFunctionTypes": true,
-        "sourceMap": true,
-        "esModuleInterop": true
-    },
-    "exclude": [
-        "node_modules",
-        "**/node_modules/*"
-    ]
+  "compilerOptions": {
+    "module": "NodeNext", // O "Node16"
+    "moduleResolution": "NodeNext", // O "Node16"
+    "target": "ES2022",
+    "jsx": "react-jsx", // Asumiendo que usarás JSX en el frontend o incluso en alguna parte del backend
+    "strict": true, // Habilitar todas las verificaciones estrictas
+    "sourceMap": true,
+    "outDir": "./dist", // Dónde se generarán tus archivos .js
+    "rootDir": "./", // Tu carpeta raíz de archivos TS
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true, // Muy importante para la portabilidad
+    "skipLibCheck": true // Opcional, acelera la compilación si no te preocupan los tipos de node_modules
+    // "noEmit": true, // Si solo quieres verificar tipos sin generar JS
+    // "incremental": true // Para compilaciones más rápidas en desarrollo
+  },
+  "include": [
+    "./**/*" // Incluye todos los archivos TS en la carpeta src
+  ],
+  "exclude": [
+    "node_modules",
+    "dist" // Excluye la carpeta de salida para evitar bucles de compilación
+  ]
 }

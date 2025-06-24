@@ -40,8 +40,12 @@ export async function loadFile(filePath: string, options: FileLoadOptions = {}):
             default:
                 return content;
         }
-    } catch (error) {
-        throw new Error(`Failed to load file "${filePath}": ${error.message}`);
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            throw new Error(`Failed to load file "${filePath}": ${error.message}`);
+        } else {
+            throw new Error(`Failed to load file "${filePath}": ${String(error)}`);
+        }
     }
 }
 
@@ -67,8 +71,13 @@ export function loadFileSync(filePath: string, options: FileLoadOptions = {}): a
             default:
                 return content;
         }
-    } catch (error) {
-        throw new Error(`Failed to load file "${filePath}": ${error.message}`);
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            throw new Error(`Failed to load file "${filePath}": ${error.message}`);
+        } else {
+            throw new Error(`Failed to load file "${filePath}": ${String(error)}`);
+        }
+       
     }
 }
 

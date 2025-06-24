@@ -1,7 +1,7 @@
 import * as http from 'http';
 import * as url from 'url';
 import * as path from 'path';
-import { Tool } from './Tool.js';
+import { Tool } from './Tool';
 import { register, Memory } from './Memory.js';
 import { ClassManager } from './ClassManager.js';
 import { Manager } from './Manager.js';

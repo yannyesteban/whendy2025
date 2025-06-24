@@ -32,7 +32,12 @@ export async function loadFile(filePath, options = {}) {
         }
     }
     catch (error) {
-        throw new Error(`Failed to load file "${filePath}": ${error.message}`);
+        if (error instanceof Error) {
+            throw new Error(`Failed to load file "${filePath}": ${error.message}`);
+        }
+        else {
+            throw new Error(`Failed to load file "${filePath}": ${String(error)}`);
+        }
     }
 }
 /**
@@ -56,7 +61,12 @@ export function loadFileSync(filePath, options = {}) {
         }
     }
     catch (error) {
-        throw new Error(`Failed to load file "${filePath}": ${error.message}`);
+        if (error instanceof Error) {
+            throw new Error(`Failed to load file "${filePath}": ${error.message}`);
+        }
+        else {
+            throw new Error(`Failed to load file "${filePath}": ${String(error)}`);
+        }
     }
 }
 // Funciones de conveniencia
