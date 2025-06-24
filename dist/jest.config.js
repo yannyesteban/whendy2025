@@ -1,3 +1,5 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 const config = {
     preset: 'ts-jest',
     testEnvironment: 'node',
@@ -7,5 +9,5 @@ const config = {
     moduleFileExtensions: ['ts', 'js'],
     extensionsToTreatAsEsm: ['.ts'],
 };
-export default config;
+exports.default = config;
 //# sourceMappingURL=jest.config.js.map

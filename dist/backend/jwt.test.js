@@ -1,4 +1,6 @@
-import { JWT } from "./JWT";
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const JWT_1 = require("./JWT");
 describe("JWT", () => {
     const secretKey = "una-clave-secreta-muy-larga-y-compleja";
     const defaultPayload = { userId: 123, role: "admin" };
@@ -8,7 +10,7 @@ describe("JWT", () => {
         // Mock Date.now para controlar el tiempo
         originalDateNow = Date.now;
         Date.now = jest.fn(() => 1750021744000); // Fecha fija: 2025-06-15
-        jwt = new JWT({ key: secretKey });
+        jwt = new JWT_1.JWT({ key: secretKey });
     });
     afterEach(() => {
         // Restaurar Date.now
@@ -17,7 +19,7 @@ describe("JWT", () => {
     });
     describe("constructor", () => {
         it("should throw an error if key is too short", () => {
-            expect(() => new JWT({ key: "short" })).toThrow("La clave debe tener al menos 32 caracteres.");
+            expect(() => new JWT_1.JWT({ key: "short" })).toThrow("La clave debe tener al menos 32 caracteres.");
         });
         it("should initialize with valid options", () => {
             const options = {
@@ -26,8 +28,8 @@ describe("JWT", () => {
                 issuer: "test-issuer",
                 audience: "test-audience",
             };
-            const instance = new JWT(options);
-            expect(instance).toBeInstanceOf(JWT);
+            const instance = new JWT_1.JWT(options);
+            expect(instance).toBeInstanceOf(JWT_1.JWT);
         });
     });
     describe("generate", () => {
@@ -38,7 +40,7 @@ describe("JWT", () => {
             expect(parts.length).toBe(3);
         });
         it("should include iat and exp in payload when expiresIn is set", () => {
-            const jwtWithExp = new JWT({ key: secretKey, expiresIn: 60 });
+            const jwtWithExp = new JWT_1.JWT({ key: secretKey, expiresIn: 60 });
             const token = jwtWithExp.generate(defaultPayload);
             const payload = jwtWithExp.verify(token);
             expect(payload).toMatchObject({
@@ -48,7 +50,7 @@ describe("JWT", () => {
             });
         });
         it("should include issuer and audience when set", () => {
-            const jwtWithOptions = new JWT({
+            const jwtWithOptions = new JWT_1.JWT({
                 key: secretKey,
                 issuer: "test-issuer",
                 audience: "test-audience",
@@ -85,19 +87,19 @@ describe("JWT", () => {
             expect(jwt.verify(invalidToken)).toBeNull();
         });
         it("should return null for expired token", () => {
-            const jwtWithExp = new JWT({ key: secretKey, expiresIn: 60 });
+            const jwtWithExp = new JWT_1.JWT({ key: secretKey, expiresIn: 60 });
             const token = jwtWithExp.generate(defaultPayload);
             // Avanzar el tiempo más allá de la expiración
             Date.now.mockReturnValue(1750021744000 + 61 * 1000);
             expect(jwtWithExp.verify(token)).toBeNull();
         });
         it("should return null for invalid issuer", () => {
-            const jwtWithIssuer = new JWT({ key: secretKey, issuer: "test-issuer" });
+            const jwtWithIssuer = new JWT_1.JWT({ key: secretKey, issuer: "test-issuer" });
             const token = jwt.generate(defaultPayload); // Token sin issuer
             expect(jwtWithIssuer.verify(token)).toBeNull();
         });
         it("should return null for invalid audience", () => {
-            const jwtWithAudience = new JWT({ key: secretKey, audience: "test-audience" });
+            const jwtWithAudience = new JWT_1.JWT({ key: secretKey, audience: "test-audience" });
             const token = jwt.generate(defaultPayload); // Token sin audience
             expect(jwtWithAudience.verify(token)).toBeNull();
         });

@@ -1,14 +1,50 @@
-import * as http from 'http';
-import * as url from 'url';
-import { Tool } from './Tool';
-import { register, Memory } from './Memory.js';
-import { ClassManager } from './ClassManager.js';
-import { Manager } from './Manager.js';
-import { DBAdmin } from './DBAdmin.js';
-import { Whendy } from './Whendy.js';
-import { Authorization } from './Authorization.js';
-import { Store } from './Store.js';
-export class Server {
+"use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Server = void 0;
+const http = __importStar(require("http"));
+const url = __importStar(require("url"));
+const Tool = __importStar(require("./Tool"));
+const Memory_js_1 = require("./Memory.js");
+const ClassManager_js_1 = require("./ClassManager.js");
+const Manager_js_1 = require("./Manager.js");
+const DBAdmin_js_1 = require("./DBAdmin.js");
+const Whendy_js_1 = require("./Whendy.js");
+const Authorization_js_1 = require("./Authorization.js");
+const Store_js_1 = require("./Store.js");
+class Server {
     server;
     port = 8080;
     classElement = [];
@@ -50,10 +86,10 @@ export class Server {
     }
     initializeComponents() {
         // Registrar memoria
-        register("memory", Memory);
+        (0, Memory_js_1.register)("memory", Memory_js_1.Memory);
         // Inicializar managers
-        this.classManager = new ClassManager(this.classElement);
-        this.sessionManager = new Manager({
+        this.classManager = new ClassManager_js_1.ClassManager(this.classElement);
+        this.sessionManager = new Manager_js_1.Manager({
             cookieName: "whsessionid",
             machineType: "memory",
             maxLifeTime: 36000,
@@ -169,15 +205,15 @@ export class Server {
         try {
             // Inicializar base de datos
             const dbInfo = moduleInfo?.db || this.db;
-            const db = new DBAdmin();
+            const db = new DBAdmin_js_1.DBAdmin();
             db.init(dbInfo);
             // Crear instancia Whendy
-            const whendy = new Whendy();
+            const whendy = new Whendy_js_1.Whendy();
             whendy.classes = this.classManager;
-            whendy.authorization = new Authorization();
+            whendy.authorization = new Authorization_js_1.Authorization();
             whendy.authorization.evalHeader(req, res);
             // Configurar Store
-            const store = new Store();
+            const store = new Store_js_1.Store();
             store.setSessionAdmin(session);
             store.setDBAdmin(db);
             await store.start(req, res);
@@ -361,4 +397,5 @@ export class Server {
         return this.moduleCache.size;
     }
 }
+exports.Server = Server;
 //# sourceMappingURL=Server.js.map

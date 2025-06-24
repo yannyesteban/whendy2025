@@ -1,7 +1,10 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.JWT = void 0;
 //import exp from "node:constants";
-import { createHmac, timingSafeEqual } from "node:crypto";
-import { Buffer } from "node:buffer";
-export class JWT {
+const node_crypto_1 = require("node:crypto");
+const node_buffer_1 = require("node:buffer");
+class JWT {
     header = {
         alg: "HS256",
         typ: "JWT",
@@ -39,12 +42,12 @@ export class JWT {
                 return null;
             const [headerEncoded, payloadEncoded, signatureEncoded] = parts;
             const msg = `${headerEncoded}.${payloadEncoded}`;
-            const signature = Buffer.from(signatureEncoded, "base64url");
-            const expected = Buffer.from(this.getSignature(msg), "base64url");
-            if (signature.length != expected.length || !timingSafeEqual(signature, expected)) {
+            const signature = node_buffer_1.Buffer.from(signatureEncoded, "base64url");
+            const expected = node_buffer_1.Buffer.from(this.getSignature(msg), "base64url");
+            if (signature.length != expected.length || !(0, node_crypto_1.timingSafeEqual)(signature, expected)) {
                 throw new Error("Firma JWT inválida");
             }
-            const payload = JSON.parse(Buffer.from(payloadEncoded, "base64url").toString("utf8"));
+            const payload = JSON.parse(node_buffer_1.Buffer.from(payloadEncoded, "base64url").toString("utf8"));
             if (payload.exp && Date.now() >= payload.exp * 1000) {
                 throw new Error("Token expirado");
             }
@@ -103,11 +106,12 @@ export class JWT {
         }
     }
     getSignature(msg) {
-        return createHmac("sha256", this.key).update(msg).digest("base64url");
+        return (0, node_crypto_1.createHmac)("sha256", this.key).update(msg).digest("base64url");
     }
 }
+exports.JWT = JWT;
 function base64Encode(msg) {
-    return Buffer.from(msg).toString("base64url");
+    return node_buffer_1.Buffer.from(msg).toString("base64url");
 }
 /*
 const jwt = new JWT({

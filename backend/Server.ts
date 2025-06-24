@@ -1,10 +1,10 @@
 import * as http from 'http';
 import * as url from 'url';
 import * as path from 'path';
-import { Tool } from './Tool';
-import { register, Memory } from './Memory.js';
+import * as Tool  from './Tool';
+import { register, Manager } from './Manager';
 import { ClassManager } from './ClassManager.js';
-import { Manager } from './Manager.js';
+import { Memory } from './Memory.js';
 import { DBAdmin } from './DBAdmin.js';
 import { Whendy } from './Whendy.js';
 import { Authorization } from './Authorization.js';

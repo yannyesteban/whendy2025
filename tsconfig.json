@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "module": "NodeNext", // O "Node16"
-    "moduleResolution": "NodeNext", // O "Node16"
+    "module": "CommonJS", // O "Node16"
+    "moduleResolution": "node", // O "Node16"
     "target": "ES2022",
     "jsx": "react-jsx", // Asumiendo que usarás JSX en el frontend o incluso en alguna parte del backend
     "strict": true, // Habilitar todas las verificaciones estrictas

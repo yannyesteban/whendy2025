@@ -1,7 +1,9 @@
-import { JWT } from './JWT'; // Ajusta el path según donde esté tu clase
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const JWT_1 = require("./JWT"); // Ajusta el path según donde esté tu clase
 describe('JWT', () => {
     const key = "clave-super-secreta-con-mas-de-32-caracteres";
-    const jwt = new JWT({ key, expiresIn: 3600, issuer: "myapp", audience: "users" });
+    const jwt = new JWT_1.JWT({ key, expiresIn: 3600, issuer: "myapp", audience: "users" });
     it('debería generar un token válido y verificarlo correctamente', () => {
         const payload = { userId: 1, role: "admin" };
         const token = jwt.generate(payload);
@@ -28,7 +30,7 @@ describe('JWT', () => {
         expect(() => jwt.generate(circular)).toThrow("Error generando JWT");
     });
     it('debería devolver null si el token está expirado', () => {
-        const jwtShort = new JWT({ key, expiresIn: -1 }); // ya expiró
+        const jwtShort = new JWT_1.JWT({ key, expiresIn: -1 }); // ya expiró
         const token = jwtShort.generate({ userId: 2 });
         const result = jwtShort.verify(token);
         expect(result).toBeNull();
